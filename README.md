@@ -30,6 +30,10 @@ https://i.imgur.com/vhX4kIZ.png
 
 Contributions are welcome! If you encounter bugs, have feature suggestions, or want to improve the code, please feel free to open an issue or submit a pull request.
 
+## Donations
+Greatly appreciated, but never required. :)
+https://www.buymeacoffee.com/nels5
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
