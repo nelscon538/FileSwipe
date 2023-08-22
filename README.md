@@ -23,7 +23,7 @@ https://i.imgur.com/vhX4kIZ.png
 
 1. Launch the application.
 2. Select a directory to organize.
-3. Swipe left to delete a file or right to keep it.
+3. Keep or Delete a file.
 4. Enjoy a clutter-free file organization experience!
 
 ## Contributing
