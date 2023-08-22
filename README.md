@@ -32,7 +32,7 @@ Contributions are welcome! If you encounter bugs, have feature suggestions, or w
 
 ## Donations
 Greatly appreciated, but never required. :)
-[Buy me a coffee](https://www.buymeacoffee.com/nels5)
+[☕️ Buy me a coffee](https://www.buymeacoffee.com/nels5)
 
 ## License
 
