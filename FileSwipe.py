@@ -3,13 +3,13 @@ import os
 import send2trash
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QPixmap, QImageReader
-from PyQt5.QtWidgets import QApplication, QDialog, QVBoxLayout, QPushButton, QLabel, QFileDialog, QSizePolicy
+from PyQt5.QtWidgets import QApplication, QDialog, QVBoxLayout, QPushButton, QLabel, QFileDialog, QSizePolicy, QMessageBox
 
 class FileOrganizerApp(QDialog):
     def __init__(self):
         super().__init__()
 
-        self.setWindowTitle("File Organizer")
+        self.setWindowTitle("FileSwipe")
 
         self.files = []
         self.current_file_index = 0
@@ -42,7 +42,7 @@ class FileOrganizerApp(QDialog):
         self.load_files()
         self.show_current_file()
 
-        self.setStyleSheet("""
+        self.setStyleSheet('''
             QDialog {
                 background-color: #f0f0f0;
             }
@@ -70,10 +70,13 @@ class FileOrganizerApp(QDialog):
             QPushButton#DeleteButton:hover {
                 background-color: #d32f2f;
             }
-        """)
+        ''')
 
     def load_files(self):
         directory = QFileDialog.getExistingDirectory(self, "Select a directory")
+        if not directory:
+            return
+        
         for root_dir, _, files in os.walk(directory):
             for file in files:
                 file_path = os.path.join(root_dir, file)
@@ -82,10 +85,10 @@ class FileOrganizerApp(QDialog):
         self.current_file_index = 0
 
     def is_valid_file(self, file_path):
-        valid_extensions = [".jpg", ".jpeg", ".png", ".gif"]  
-        if os.path.isfile(file_path) and not file_path.lower().endswith(tuple(valid_extensions)):
-            return False
-        return True
+        valid_extensions = [".jpg", ".jpeg", ".png", ".gif"]
+        if os.path.isfile(file_path) and file_path.lower().endswith(tuple(valid_extensions)):
+            return True
+        return False
 
     def show_current_file(self):
         if self.current_file_index < len(self.files):
@@ -93,18 +96,23 @@ class FileOrganizerApp(QDialog):
             pixmap = self.load_thumbnail(file_path)
             if pixmap is not None:
                 self.canvas.setPixmap(pixmap)
-                self.filename_label.setText(os.path.basename(file_path))  
+                self.filename_label.setText(os.path.basename(file_path))
+        else:
+            self.feedback_no_more_files()
 
     def load_thumbnail(self, file_path):
-        image_reader = QImageReader(file_path)
-        image_reader.setAutoTransform(True)
-        size = image_reader.size()
-        if size.isValid():
-            pixmap = QPixmap(file_path)
-            scaled_pixmap = pixmap.scaled(
-                self.canvas.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation
-            )
-            return scaled_pixmap
+        try:
+            image_reader = QImageReader(file_path)
+            image_reader.setAutoTransform(True)
+            size = image_reader.size()
+            if size.isValid():
+                pixmap = QPixmap(file_path)
+                scaled_pixmap = pixmap.scaled(
+                    self.canvas.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation
+                )
+                return scaled_pixmap
+        except Exception as e:
+            QMessageBox.warning(self, "Error", f"An error occurred while loading the image: {e}")
 
     def keep_file(self):
         self.current_file_index += 1
@@ -113,10 +121,15 @@ class FileOrganizerApp(QDialog):
     def delete_file(self):
         if self.current_file_index < len(self.files):
             file_path = self.files[self.current_file_index]
-            normalized_path = os.path.normpath(file_path)  
-            send2trash.send2trash(normalized_path)  
-            del self.files[self.current_file_index]
+            try:
+                send2trash.send2trash(file_path)
+                del self.files[self.current_file_index]
+            except Exception as e:
+                QMessageBox.warning(self, "Error", f"An error occurred while deleting the file: {e}")
             self.show_current_file()
+
+    def feedback_no_more_files(self):
+        QMessageBox.information(self, "Done", "You've gone through all the files!")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
